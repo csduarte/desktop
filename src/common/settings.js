@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const deepmerge = require('deepmerge').default;
 
 const settingsVersion = 1;
@@ -11,7 +12,7 @@ function merge(base, target) {
   return Object.assign({}, base, target);
 }
 
-function deepMergeArray(dest) {
+function deepMergeArray(source, dest) {
   return dest;
 }
 
@@ -24,7 +25,7 @@ function loadDefault(version, spellCheckerLocale) {
   const base = baseConfig[ver] || baseConfig.default;
   const override = overrideConfig[ver] || {};
 
-  const defaults = deepmerge(base, override, {clone: true, arrayMerge: deepMergeArray});
+  const defaults = deepmerge(base, override, {arrayMerge: deepMergeArray});
 
   return Object.assign(defaults, {
     spellCheckerLocale: spellCheckerLocale || defaults.spellCheckerLocale || 'en-US'
@@ -80,10 +81,17 @@ module.exports = {
   },
 
   writeFileSync(configFile, config) {
+    console.log('default here', configFile);
     // need to be able to compare 1 to '1'
     if (config.version != settingsVersion) { // eslint-disable-line
       throw new Error('version ' + config.version + ' is not equal to ' + settingsVersion);
     }
+
+    const dir = path.dirname(configFile);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+
     var data = JSON.stringify(config, null, '  ');
     fs.writeFileSync(configFile, data, 'utf8');
   },
