@@ -82,7 +82,9 @@ module.exports = {
 
   writeFileSync(configFile, config) {
     console.log('default here', configFile);
+
     // need to be able to compare 1 to '1'
+
     if (config.version != settingsVersion) { // eslint-disable-line
       throw new Error('version ' + config.version + ' is not equal to ' + settingsVersion);
     }
